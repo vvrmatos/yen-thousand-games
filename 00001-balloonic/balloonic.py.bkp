@@ -1,0 +1,98 @@
+import pygame
+import random
+
+pygame.init()
+
+display_info = pygame.display.Info()
+screen_width = display_info.current_w
+screen_height = display_info.current_h
+
+screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
+pygame.display.set_caption("Balloon Popping Game")
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+pygame.font.init()
+score_font = pygame.font.SysFont(None, 36)
+
+pygame.mixer.init()
+pygame.mixer.music.load("balloonic.mp3")
+pygame.mixer.music.play(-1)
+pop_sound = pygame.mixer.Sound("pop_sound.mp3")
+pop_sound.set_volume(0.75)
+
+start_ticks = pygame.time.get_ticks()
+
+score = 0
+
+
+class Balloon(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((50, 50))
+        self.image.fill((255, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.centerx = random.randint(50, screen_width - 50)
+        self.rect.bottom = screen_height + 10
+        self.speedy = random.randint(1, 4)
+
+    def update(self):
+        self.rect.y -= self.speedy
+        if self.rect.bottom < 0:
+            self.rect.top = screen_height + 10
+            self.rect.centerx = random.randint(50, screen_width - 50)
+            self.speedy = random.randint(1, 4)
+
+
+all_sprites = pygame.sprite.Group()
+balloons = pygame.sprite.Group()
+
+
+def add_balloon():
+    balloon = Balloon()
+    all_sprites.add(balloon)
+    balloons.add(balloon)
+
+
+for _ in range(10):
+    add_balloon()
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            clicked_sprites = [s for s in balloons if s.rect.collidepoint(pos)]
+            for sprite in clicked_sprites:
+                sprite.kill()
+                pop_sound.play()
+                score += 1
+
+    all_sprites.update()
+
+    if len(balloons) < 10:
+        add_balloon()
+
+    screen.fill(WHITE)
+    all_sprites.draw(screen)
+
+    score_text = score_font.render(f"Score: {score}", True, BLACK)
+    screen.blit(score_text, (10, 10))
+
+    seconds = (pygame.time.get_ticks() - start_ticks) // 1000
+    time_left = max(30 - seconds, 0)
+    timer_text = score_font.render(f"Time left: {time_left}", True, BLACK)
+    screen.blit(timer_text, (screen_width - 150, 10))
+
+    if time_left <= 0:
+        print("Game Over!")
+        running = False
+
+    pygame.display.flip()
+
+    pygame.time.Clock().tick(60)
+
+pygame.quit()
