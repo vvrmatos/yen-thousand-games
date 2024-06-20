@@ -128,24 +128,24 @@ def game_over():
     screen.blit(
         score_text,
         (
-            screen_width // 2 - score_text.get_width() // 2,
-            screen_height // 2 - score_text.get_height() // 2,
+            screen.get_width() // 2 - score_text.get_width() // 2,
+            screen.get_height() // 2 - score_text.get_height() // 2,
         ),
     )
     play_again_text = score_font.render("Press SPACE to play again", True, BLACK)
     screen.blit(
         play_again_text,
         (
-            screen_width // 2 - play_again_text.get_width() // 2,
-            screen_height // 2 + score_text.get_height() // 2 + 50,
+            screen.get_width() // 2 - play_again_text.get_width() // 2,
+            screen.get_height() // 2 + score_text.get_height() // 2 + 50,
         ),
     )
     exit_text = score_font.render("Press Esc to leave", True, BLACK)
     screen.blit(
         exit_text,
         (
-            screen_width // 2 - exit_text.get_width() // 2,
-            screen_height // 2 + score_text.get_height() // 2 + 80,
+            screen.get_width() // 2 - exit_text.get_width() // 2,
+            screen.get_height() // 2 + score_text.get_height() // 2 + 80,
         ),
     )
     pygame.display.flip()
